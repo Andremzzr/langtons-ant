@@ -65,21 +65,19 @@ class Ant {
 
     // [0, 0, 0]
     // [0, 0, 0]
-    moveFoward() {
+    moveFoward(rows, cols) {
         switch (this.head) {
             case 'N':
-                this.row-=1;
+                this.row = (this.row - 1 + rows) % rows;
                 break;
             case 'E':
-                this.col+=1;
+                this.col = (this.col + 1) % cols;
                 break;
             case 'S':
-                this.row+=1;
+                this.row = (this.row + 1) % rows;
                 break;
             case 'W':
-                this.col-=1;
-                break;
-            default:
+                this.col = (this.col - 1 + cols) % cols;
                 break;
         }
     }
@@ -117,10 +115,6 @@ class Grid {
     setWhite(row, col) {
         this.grid[row][col] = WHITE;
     }
-
-    getCell(row, col) {
-        return this.grid[row][col]
-    }
 }
 
 
@@ -141,29 +135,32 @@ const ant = new Ant('N');
 
 ant.setPosition(Math.floor(rows / 2), Math.floor(cols / 2))
 
-function fillCell(x, y) {
-    ctx.fillStyle = 'white';
-    ctx.fillRect(x * cellSize, y *cellSize, cellSize, cellSize);
+function fillCell(color, i, j) {
+    ctx.fillStyle = color;
+    ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
 }
 
 function drawGrid(grid) {
     ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
     for (let i = 0; i < grid.length; i++) {
         for (let j = 0; j < grid[i].length; j++) {
-            if( grid[i][j] ) {
-                fillCell(j, i)
+            if (grid[i][j]) {
+                fillCell('white', i ,j)
             } else {
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 0.5;
-                ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                fillCell('black', i ,j)
             }
+
+            ctx.strokeStyle = 'gray';
+            ctx.lineWidth = 0.5;
+            ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
         }
     }
 }
 setInterval(() => {
     drawGrid(grid.display())
-    if ( ! grid.getCell(ant.row, ant.col)) {
+    if ( !grid.display()[ant.row][ant.col]) {
         //BLACK CELL
         grid.setWhite(ant.row, ant.col)
         ant.turnLeft();
@@ -172,5 +169,5 @@ setInterval(() => {
         grid.setBlack(ant.row, ant.col)
         ant.turnRight();
     }
-    ant.moveFoward();
-}, 200)
+    ant.moveFoward(rows, cols);
+}, 10)
