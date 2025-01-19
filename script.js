@@ -123,15 +123,46 @@ class Grid {
     }
 }
 
-const cols = 10
-const rows = 10
 
+
+const canvas = document.getElementById('gameCanvas')
+const ctx = canvas.getContext('2d');
+const cellSize = 15;
+
+
+
+const cols = Math.floor(canvas.width / cellSize)
+const rows = Math.floor(canvas.height / cellSize)
+
+console.log(cols, rows)
 const grid = new Grid(cols, rows)
 const ant = new Ant('N');
 
+
 ant.setPosition(Math.floor(rows / 2), Math.floor(cols / 2))
 
+function fillCell(x, y) {
+    ctx.fillStyle = 'white';
+    ctx.fillRect(x * cellSize, y *cellSize, cellSize, cellSize);
+}
+
+function drawGrid(grid) {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < grid.length; i++) {
+        for (let j = 0; j < grid[i].length; j++) {
+            if( grid[i][j] ) {
+                fillCell(j, i)
+            } else {
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 0.5;
+                ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            }
+        }
+    }
+}
 setInterval(() => {
+    drawGrid(grid.display())
     if ( ! grid.getCell(ant.row, ant.col)) {
         //BLACK CELL
         grid.setWhite(ant.row, ant.col)
@@ -142,5 +173,4 @@ setInterval(() => {
         ant.turnRight();
     }
     ant.moveFoward();
-    console.table(grid.display())
-}, 2000)
+}, 200)
